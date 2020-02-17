@@ -40,7 +40,7 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
     public function setApi($api): void
     {
         if (false === is_array($api)) {
-            throw new UnsupportedApiException('Not supported. Expected to be set as array.');
+            throw new UnsupportedApiException('Not supported.Expected to be set as array.');
         }
 
         $this->przelewy24Bridge->setAuthorizationData($api['merchant_id'], $api['crc_key'], $api['environment']);

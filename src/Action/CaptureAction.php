@@ -24,6 +24,7 @@ use Payum\Core\Request\Capture;
 use Payum\Core\Security\GenericTokenFactoryAwareInterface;
 use Payum\Core\Security\GenericTokenFactoryInterface;
 use Payum\Core\Security\TokenInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final class CaptureAction implements ActionInterface, ApiAwareInterface, GenericTokenFactoryAwareInterface, GatewayAwareInterface
 {
@@ -35,15 +36,22 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
     /** @var Przelewy24BridgeInterface */
     private $przelewy24Bridge;
 
+    /** @var ContainerInterface */
+    private $container;
+
     public function __construct(Przelewy24BridgeInterface $przelewy24Bridge)
     {
         $this->przelewy24Bridge = $przelewy24Bridge;
     }
 
+    public function setContainer(ContainerInterface $container) {
+        $this->container = $container;
+    }
+
     public function setApi($api): void
     {
         if (false === is_array($api)) {
-            throw new UnsupportedApiException('Not supported. Expected to be set as array.');
+            throw new UnsupportedApiException('Not supported.Expected to be set as array.');
         }
 
         $this->przelewy24Bridge->setAuthorizationData($api['merchant_id'], $api['crc_key'], $api['environment']);
@@ -68,10 +76,15 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
         $token = $request->getToken();
         $details['p24_session_id'] = uniqid();
         $notifyToken = $this->tokenFactory->createNotifyToken($token->getGatewayName(), $token->getDetails());
-        $details['p24_url_return'] = $this->api['succcess_url'] ?: $token->getAfterUrl() ;
-        $details['p24_url_cancel'] =  $this->api['cancel_url'] ?: $token->getAfterUrl() . '&' . http_build_query(['status' => Przelewy24BridgeInterface::CANCELLED_STATUS]);
+        $details['p24_url_return'] = $token->getAfterUrl();
+        $details['p24_url_cancel'] = $token->getAfterUrl() . '&' . http_build_query(['status' => Przelewy24BridgeInterface::CANCELLED_STATUS]);
         $details['p24_wait_for_result'] = '1';
-        $details['p24_url_status'] = $this->api['status_url'] ?: $notifyToken->getTargetUrl();
+        $details['p24_url_status'] = $notifyToken->getTargetUrl();
+        if (!empty($this->fakeNotifyUrl)) {
+            $notifyUrl = str_replace('{token}', $notifyToken->getHash(), $this->fakeNotifyUrl);
+            $details['p24_url_status'] = $notifyUrl;
+        }
+
         $details['token'] = $this->przelewy24Bridge->trnRegister($details->toUnsafeArray());
         $details['p24_status'] = Przelewy24BridgeInterface::CREATED_STATUS;
 

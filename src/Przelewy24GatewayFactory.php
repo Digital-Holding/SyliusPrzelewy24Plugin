@@ -29,9 +29,6 @@ final class Przelewy24GatewayFactory extends GatewayFactory
             $config['payum.default_options'] = [
                 'crc_key' => null,
                 'merchant_id' => null,
-                'success_url' => null,
-                'cancel_url' => null,
-                'notify_url' => null,
                 'environment' => Przelewy24BridgeInterface::SANDBOX_ENVIRONMENT,
             ];
 
@@ -49,9 +46,6 @@ final class Przelewy24GatewayFactory extends GatewayFactory
                     'crc_key' => $config['crc_key'],
                     'merchant_id' => $config['merchant_id'],
                     'environment' => $config['environment'],
-                    'success_url' => $config['success_url'],
-                    'cancel_url' => $config['cancel_url'],
-                    'notify_url' => $config['notify_url'],
                     'payum.http_client' => $config['payum.http_client'],
                 ];
             };
