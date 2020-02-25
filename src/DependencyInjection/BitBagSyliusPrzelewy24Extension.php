@@ -25,5 +25,6 @@ final class BitBagSyliusPrzelewy24Extension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $container->setParameter('fake_notify_url', ($config['fake_notify_url'] ?? null));
+        $container->setParameter('allow_retry', ($config['allow_retry'] ?? true));
     }
 }
