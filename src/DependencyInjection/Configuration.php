@@ -25,6 +25,9 @@ final class Configuration implements ConfigurationInterface
         $rootNode->children()
             ->scalarNode('fake_notify_url')
             ->end()
+            ->booleanNode('allow_retry')
+            ->defaultTrue()
+            ->end()
         ->end()
         ;
 

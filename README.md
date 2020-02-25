@@ -135,6 +135,11 @@ Now resend this, for example using **Postman** application to your local Sylius 
 So in this case, resend this post to:
 `http://localhost:8000/payment/notify/_u8-Y2w2cAXgHfy-bmnekenAMQ_V-lmONvm2mxL7iU0`
 
+## Additional options
+
+`allow_retry` - allows multiple attempts over same payment objects, until status `completed` is reached.
+Defaults to `true`.
+
 ## Contribution
 
 Learn more about our contribution workflow on http://docs.sylius.org/en/latest/contributing/.

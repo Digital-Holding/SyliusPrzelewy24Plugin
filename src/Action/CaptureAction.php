@@ -44,7 +44,8 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
         $this->przelewy24Bridge = $przelewy24Bridge;
     }
 
-    public function setContainer(ContainerInterface $container) {
+    public function setContainer(ContainerInterface $container)
+    {
         $this->container = $container;
     }
 
@@ -68,8 +69,14 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
 
         $details = $request->getModel();
 
-        if (isset($details['p24_status'])) {
-            return;
+        if ($this->container->getParameter('allow_retry') === true) {
+            if (isset($details['p24_status']) && $details['p24_status'] === Przelewy24BridgeInterface::COMPLETED_STATUS) {
+                return;
+            }
+        } else {
+            if (isset($details['p24_status'])) {
+                return;
+            }
         }
 
         /** @var TokenInterface $token */
